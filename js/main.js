@@ -3994,3 +3994,796 @@ window.addEventListener(
 
 calculateGalleryProgress();
 updatePage();
+
+/* =========================================================
+   PUNSHONSTUDIO
+   SEQUÊNCIA WEBP CONTROLADA PELO SCROLL
+   ========================================================= */
+
+(() => {
+    const section = document.querySelector("#logo-scroll");
+    const canvas = document.querySelector("#logo-sequence");
+    const loadingText = document.querySelector(
+        "#logo-scroll-loading-text"
+    );
+    const loadingProgress = document.querySelector(
+        "#logo-scroll-loading-progress"
+    );
+
+    if (!section || !canvas) {
+        console.warn(
+            "A introdução do logótipo não foi encontrada."
+        );
+        return;
+    }
+
+    const context = canvas.getContext("2d", {
+        alpha: false,
+        desynchronized: true
+    });
+
+    if (!context) {
+        console.warn(
+            "O navegador não suporta canvas 2D."
+        );
+        return;
+    }
+
+    const FRAME_COUNT = 120;
+    const FIRST_FRAME = 0;
+    const LAST_FRAME = FRAME_COUNT - 1;
+
+  const IMAGE_FOLDER = "images/logo-scroll";
+const FILE_PREFIX = "logo-scroll-frames_";
+const FILE_SUFFIX = "_resultado.webp";
+
+    const MAX_PIXEL_RATIO = 2;
+    const PRELOAD_BATCH_SIZE = 8;
+
+    const frames = new Array(FRAME_COUNT);
+
+    let loadedFrames = 0;
+    let currentFrame = -1;
+    let requestedFrame = 0;
+    let animationFrameId = null;
+    let resizeTimer = null;
+    let firstFrameRendered = false;
+
+    const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+    ).matches;
+
+    function framePath(index) {
+    const number = String(index + FIRST_FRAME).padStart(
+        5,
+        "0"
+    );
+
+    return `${IMAGE_FOLDER}/${FILE_PREFIX}${number}${FILE_SUFFIX}`;
+}
+
+    function updateLoadingInterface() {
+        const percentage = Math.round(
+            (loadedFrames / FRAME_COUNT) * 100
+        );
+
+        if (loadingText) {
+            loadingText.textContent =
+                `A carregar ${percentage}%`;
+        }
+
+        if (loadingProgress) {
+            loadingProgress.style.width =
+                `${percentage}%`;
+        }
+    }
+
+    function loadFrame(index) {
+        if (index < 0 || index >= FRAME_COUNT) {
+            return Promise.resolve(false);
+        }
+
+        if (frames[index]) {
+            return Promise.resolve(true);
+        }
+
+        return new Promise((resolve) => {
+            const image = new Image();
+
+            image.decoding = "async";
+            image.src = framePath(index);
+
+            image.onload = () => {
+                frames[index] = image;
+                loadedFrames += 1;
+
+                updateLoadingInterface();
+
+                if (
+                    index === 0 &&
+                    !firstFrameRendered
+                ) {
+                    resizeCanvas();
+                    drawFrame(0);
+
+                    firstFrameRendered = true;
+                    section.classList.add("is-ready");
+                }
+
+                resolve(true);
+            };
+
+            image.onerror = () => {
+                console.error(
+                    "Não foi possível carregar:",
+                    framePath(index)
+                );
+
+                resolve(false);
+            };
+        });
+    }
+
+    /*
+    Carrega primeiro alguns frames distribuídos pela
+    animação. Assim, o utilizador vê alguma coisa mesmo
+    antes de os 120 frames terminarem de carregar.
+    */
+
+    function loadPriorityFrames() {
+        const indexes = [
+            0,
+            1,
+            2,
+            3,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            100,
+            110,
+            119
+        ];
+
+        return Promise.all(
+            indexes.map((index) => loadFrame(index))
+        );
+    }
+
+    function loadRemainingFrames() {
+        const priority = new Set([
+            0,
+            1,
+            2,
+            3,
+            10,
+            20,
+            30,
+            40,
+            50,
+            60,
+            70,
+            80,
+            90,
+            100,
+            110,
+            119
+        ]);
+
+        const queue = [];
+
+        for (
+            let index = 0;
+            index < FRAME_COUNT;
+            index += 1
+        ) {
+            if (!priority.has(index)) {
+                queue.push(index);
+            }
+        }
+
+        async function processBatch(start) {
+            const batch = queue.slice(
+                start,
+                start + PRELOAD_BATCH_SIZE
+            );
+
+            if (!batch.length) {
+                section.classList.add(
+                    "all-frames-loaded"
+                );
+                return;
+            }
+
+            await Promise.all(
+                batch.map((index) => loadFrame(index))
+            );
+
+            window.setTimeout(() => {
+                processBatch(
+                    start + PRELOAD_BATCH_SIZE
+                );
+            }, 25);
+        }
+
+        processBatch(0);
+    }
+
+    function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+
+        const pixelRatio = Math.min(
+            window.devicePixelRatio || 1,
+            MAX_PIXEL_RATIO
+        );
+
+        const width = Math.max(
+            1,
+            Math.round(
+                rect.width * pixelRatio
+            )
+        );
+
+        const height = Math.max(
+            1,
+            Math.round(
+                rect.height * pixelRatio
+            )
+        );
+
+        if (
+            canvas.width !== width ||
+            canvas.height !== height
+        ) {
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        if (currentFrame >= 0) {
+            drawFrame(currentFrame, true);
+        }
+    }
+
+    function nearestLoadedFrame(target) {
+        if (frames[target]) {
+            return target;
+        }
+
+        for (
+            let distance = 1;
+            distance < FRAME_COUNT;
+            distance += 1
+        ) {
+            const previous = target - distance;
+            const next = target + distance;
+
+            if (
+                previous >= 0 &&
+                frames[previous]
+            ) {
+                return previous;
+            }
+
+            if (
+                next < FRAME_COUNT &&
+                frames[next]
+            ) {
+                return next;
+            }
+        }
+
+        return 0;
+    }
+
+    function drawFrame(target, force = false) {
+        const safeTarget = Math.min(
+            LAST_FRAME,
+            Math.max(0, target)
+        );
+
+        if (
+            !force &&
+            currentFrame === safeTarget
+        ) {
+            return;
+        }
+
+        const availableIndex =
+            nearestLoadedFrame(safeTarget);
+
+        const image =
+            frames[availableIndex];
+
+        if (!image) {
+            return;
+        }
+
+        const canvasWidth =
+            canvas.width;
+
+        const canvasHeight =
+            canvas.height;
+
+        const imageWidth =
+            image.naturalWidth ||
+            image.width;
+
+        const imageHeight =
+            image.naturalHeight ||
+            image.height;
+
+        /*
+        "contain" mantém o enquadramento completo do
+        After Effects sem cortar as extremidades.
+
+        Como os frames já têm fundo preto, as faixas
+        restantes também aparecem pretas.
+        */
+
+        const scale = Math.min(
+            canvasWidth / imageWidth,
+            canvasHeight / imageHeight
+        );
+
+        const drawWidth =
+            imageWidth * scale;
+
+        const drawHeight =
+            imageHeight * scale;
+
+        const drawX =
+            (canvasWidth - drawWidth) / 2;
+
+        const drawY =
+            (canvasHeight - drawHeight) / 2;
+
+        context.fillStyle = "#030303";
+
+        context.fillRect(
+            0,
+            0,
+            canvasWidth,
+            canvasHeight
+        );
+
+        context.drawImage(
+            image,
+            drawX,
+            drawY,
+            drawWidth,
+            drawHeight
+        );
+
+        currentFrame = safeTarget;
+    }
+
+    function getProgress() {
+        const rect =
+            section.getBoundingClientRect();
+
+        const distance =
+            section.offsetHeight -
+            window.innerHeight;
+
+        if (distance <= 0) {
+            return 0;
+        }
+
+        return Math.min(
+            1,
+            Math.max(
+                0,
+                -rect.top / distance
+            )
+        );
+    }
+
+    function updateHeaderState(progress) {
+        const isInsideIntro =
+            progress < 0.985;
+
+        document.body.classList.toggle(
+            "logo-intro-active",
+            isInsideIntro
+        );
+    }
+
+   function clamp(value, minimum = 0, maximum = 1) {
+    return Math.min(
+        maximum,
+        Math.max(minimum, value)
+    );
+}
+
+function rangeProgress(
+    progress,
+    start,
+    end
+) {
+    return clamp(
+        (progress - start) /
+        (end - start)
+    );
+}
+
+function easeInOutCubic(value) {
+    if (value < 0.5) {
+        return 4 * value * value * value;
+    }
+
+    return 1 -
+        Math.pow(
+            -2 * value + 2,
+            3
+        ) / 2;
+}
+
+function easeOutQuint(value) {
+    return 1 -
+        Math.pow(
+            1 - value,
+            5
+        );
+}
+
+function clampTransition(
+    value,
+    minimum = 0,
+    maximum = 1
+) {
+    return Math.min(
+        maximum,
+        Math.max(minimum, value)
+    );
+}
+
+function transitionRange(
+    value,
+    start,
+    end
+) {
+    if (end === start) {
+        return value >= end ? 1 : 0;
+    }
+
+    return clampTransition(
+        (value - start) /
+        (end - start)
+    );
+}
+
+function transitionEase(value) {
+    const safeValue =
+        clampTransition(value);
+
+    return 1 -
+        Math.pow(
+            1 - safeValue,
+            4
+        );
+}
+
+
+function updateCinematicTransition(progress) {
+    const hero =
+        document.querySelector(".hero");
+
+    /*
+    A sequência começa a sair nos últimos 14%.
+    Não se tenta sobrepor fisicamente o hero ao sticky.
+    Isso evita o desaparecimento produzido pela margem negativa.
+    */
+
+    const exitRaw =
+        transitionRange(
+            progress,
+            0.86,
+            1
+        );
+
+    const exitProgress =
+        transitionEase(
+            exitRaw
+        );
+
+    const canvasOpacity =
+        1 -
+        transitionEase(
+            transitionRange(
+                progress,
+                0.91,
+                1
+            )
+        );
+
+    const canvasScale =
+        1 +
+        exitProgress * 0.08;
+
+    const canvasBlur =
+        transitionRange(
+            progress,
+            0.90,
+            1
+        ) * 8;
+
+    const flashProgress =
+        transitionRange(
+            progress,
+            0.87,
+            0.985
+        );
+
+    const flashOpacity =
+        Math.sin(
+            flashProgress *
+            Math.PI
+        ) * 0.85;
+
+    const flashPosition =
+        -120 +
+        flashProgress * 260;
+
+    section.style.setProperty(
+        "--logo-exit-progress",
+        exitProgress.toFixed(4)
+    );
+
+    section.style.setProperty(
+        "--logo-exit-opacity",
+        canvasOpacity.toFixed(4)
+    );
+
+    section.style.setProperty(
+        "--logo-exit-scale",
+        canvasScale.toFixed(4)
+    );
+
+    section.style.setProperty(
+        "--logo-exit-blur",
+        `${canvasBlur.toFixed(2)}px`
+    );
+
+    section.style.setProperty(
+        "--transition-flash-opacity",
+        flashOpacity.toFixed(4)
+    );
+
+    section.style.setProperty(
+        "--transition-flash-x",
+        `${flashPosition.toFixed(2)}%`
+    );
+
+    /*
+    O hero recebe valores seguros. No topo da página,
+    fica preparado para entrar. Quando o utilizador chega
+    ao hero, uma função independente calcula a sua entrada.
+    */
+
+    if (hero) {
+        hero.classList.toggle(
+            "hero-cinematic-enter",
+            progress > 0.88
+        );
+    }
+}
+function updateHeroReveal() {
+    const hero =
+        document.querySelector(".hero");
+
+    if (!hero) {
+        return;
+    }
+
+    const rect =
+        hero.getBoundingClientRect();
+
+    const viewportHeight =
+        window.innerHeight;
+
+    /*
+    Começa quando a parte superior do hero entra pelos
+    últimos 20% do ecrã e termina perto do centro.
+    */
+
+    const rawProgress =
+        clampTransition(
+            (
+                viewportHeight * 0.98 -
+                rect.top
+            ) /
+            (
+                viewportHeight * 0.72
+            )
+        );
+
+    const progress =
+        transitionEase(
+            rawProgress
+        );
+
+    const contentProgress =
+        transitionEase(
+            transitionRange(
+                progress,
+                0.22,
+                1
+            )
+        );
+
+    const imageProgress =
+        transitionEase(
+            transitionRange(
+                progress,
+                0,
+                0.9
+            )
+        );
+
+    const lineProgress =
+        Math.sin(
+            clampTransition(
+                progress
+            ) *
+            Math.PI
+        );
+
+    hero.style.setProperty(
+        "--hero-content-opacity",
+        contentProgress.toFixed(4)
+    );
+
+    hero.style.setProperty(
+        "--hero-content-y",
+        `${(
+            65 *
+            (1 - contentProgress)
+        ).toFixed(2)}px`
+    );
+
+    hero.style.setProperty(
+        "--hero-image-opacity",
+        (
+            0.15 +
+            imageProgress * 0.85
+        ).toFixed(4)
+    );
+
+    hero.style.setProperty(
+        "--hero-image-y",
+        `${(
+            85 *
+            (1 - imageProgress)
+        ).toFixed(2)}px`
+    );
+
+    hero.style.setProperty(
+        "--hero-image-scale",
+        (
+            1.08 -
+            imageProgress * 0.08
+        ).toFixed(4)
+    );
+
+    hero.style.setProperty(
+        "--hero-image-brightness",
+        (
+            0.48 +
+            imageProgress * 0.52
+        ).toFixed(4)
+    );
+
+    hero.style.setProperty(
+        "--hero-overlay-opacity",
+        (
+            0.78 -
+            imageProgress * 0.36
+        ).toFixed(4)
+    );
+
+    hero.style.setProperty(
+        "--hero-top-line-width",
+        `${(
+            lineProgress * 70
+        ).toFixed(2)}%`
+    );
+
+    hero.style.setProperty(
+        "--hero-top-line-opacity",
+        lineProgress.toFixed(4)
+    );
+
+    hero.classList.toggle(
+        "hero-cinematic-complete",
+        progress >= 0.995
+    );
+}
+function updateFromScroll() {
+    animationFrameId = null;
+
+    const progress =
+        reducedMotion
+            ? 0
+            : getProgress();
+
+    requestedFrame = Math.min(
+        LAST_FRAME,
+        Math.round(
+            progress * LAST_FRAME
+        )
+    );
+
+    section.classList.toggle(
+        "has-scrolled",
+        progress > 0.012
+    );
+
+    section.classList.toggle(
+        "is-ending",
+        progress > 0.86
+    );
+
+    updateCinematicTransition(
+        progress
+    );
+
+    updateHeroReveal();
+    updateHeaderState(progress);
+    drawFrame(requestedFrame);
+}
+
+    function requestScrollUpdate() {
+        if (animationFrameId !== null) {
+            return;
+        }
+
+        animationFrameId =
+            window.requestAnimationFrame(
+                updateFromScroll
+            );
+    }
+
+    window.addEventListener(
+        "scroll",
+        requestScrollUpdate,
+        {
+            passive: true
+        }
+    );
+
+    window.addEventListener(
+        "resize",
+        () => {
+            window.clearTimeout(
+                resizeTimer
+            );
+
+            resizeTimer =
+                window.setTimeout(
+                    () => {
+                        resizeCanvas();
+                        requestScrollUpdate();
+                    },
+                    120
+                );
+        }
+    );
+
+    /*
+    O primeiro frame é carregado imediatamente.
+    Os restantes são carregados depois por lotes.
+    */
+   updateHeroReveal();
+
+    loadFrame(0)
+        .then(() => loadPriorityFrames())
+        .then(() => {
+            loadRemainingFrames();
+            requestScrollUpdate();
+        });
+})();

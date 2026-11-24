@@ -6503,3 +6503,640 @@ img.is-loaded {
         transform: none;
     }
 }
+/* =========================================================
+   PUNSHONSTUDIO
+   INTRO DO LOGÓTIPO CONTROLADA PELO SCROLL
+   ========================================================= */
+
+:root {
+    --logo-scroll-background: #030303;
+    --logo-scroll-gold: #d3a250;
+    --logo-scroll-height: 340vh;
+}
+
+/*
+A secção tem altura superior ao ecrã para criar
+o espaço necessário para percorrer os 120 frames.
+*/
+
+.logo-scroll {
+    position: relative;
+    z-index: 40;
+    width: 100%;
+    height: var(--logo-scroll-height);
+    margin: 0;
+    padding: 0;
+    background: var(--logo-scroll-background);
+    contain: layout style;
+}
+
+.logo-scroll__sticky {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    height: 100vh;
+    height: 100svh;
+    min-height: 540px;
+    overflow: hidden;
+    background: var(--logo-scroll-background);
+    isolation: isolate;
+}
+
+/*
+O canvas ocupa o ecrã todo.
+O desenho interno é ajustado pelo JavaScript.
+*/
+
+.logo-scroll__canvas {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background: var(--logo-scroll-background);
+    transition: opacity 700ms ease;
+    transform: translateZ(0);
+    will-change: contents;
+}
+
+.logo-scroll.is-ready .logo-scroll__canvas {
+    opacity: 1;
+}
+
+/* Carregamento */
+
+.logo-scroll__loading {
+    position: absolute;
+    left: 50%;
+    bottom: max(42px, env(safe-area-inset-bottom));
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    width: min(250px, 72vw);
+    color: rgba(255, 255, 255, 0.62);
+    transform: translateX(-50%);
+    transition:
+        opacity 450ms ease,
+        visibility 450ms ease;
+}
+
+.logo-scroll.is-ready .logo-scroll__loading {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.logo-scroll__loading-track {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 1px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+.logo-scroll__loading-progress {
+    position: absolute;
+    inset: 0 auto 0 0;
+    display: block;
+    width: 0%;
+    background:
+        linear-gradient(
+            90deg,
+            #8d5b20,
+            #f2c56f,
+            #fff0bd
+        );
+    box-shadow:
+        0 0 12px rgba(211, 162, 80, 0.55);
+    transition: width 180ms linear;
+}
+
+.logo-scroll__loading-text {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+}
+
+/* Indicação para fazer scroll */
+
+.logo-scroll__hint {
+    position: absolute;
+    left: 50%;
+    bottom: max(34px, env(safe-area-inset-bottom));
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 13px;
+    color: rgba(255, 255, 255, 0.58);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-50%);
+    transition:
+        opacity 600ms ease,
+        visibility 600ms ease,
+        transform 600ms ease;
+}
+
+.logo-scroll.is-ready .logo-scroll__hint {
+    opacity: 1;
+    visibility: visible;
+}
+
+.logo-scroll.has-scrolled .logo-scroll__hint {
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, 12px);
+}
+
+.logo-scroll__hint > span:first-child {
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    font-size: 9px;
+    font-weight: 400;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.logo-scroll__mouse {
+    position: relative;
+    display: block;
+    width: 18px;
+    height: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.46);
+    border-radius: 20px;
+}
+
+.logo-scroll__mouse span {
+    position: absolute;
+    top: 7px;
+    left: 50%;
+    width: 2px;
+    height: 5px;
+    border-radius: 999px;
+    background: var(--logo-scroll-gold);
+    transform: translateX(-50%);
+    animation:
+        logoScrollMouse 1.65s ease-in-out infinite;
+}
+
+/* Transição suave para o hero */
+
+.logo-scroll__end-shade {
+    position: absolute;
+    inset: auto 0 0;
+    z-index: 2;
+    height: 25vh;
+    pointer-events: none;
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(3, 3, 3, 0.3) 38%,
+            #030303 100%
+        );
+}
+
+/* Fallback sem JavaScript */
+
+.logo-scroll__noscript {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: grid;
+    place-items: center;
+    color: var(--logo-scroll-gold);
+    font-size: clamp(2rem, 8vw, 7rem);
+    letter-spacing: 0.12em;
+    background: #030303;
+}
+
+/* Esconde o cabeçalho durante a introdução */
+
+body.logo-intro-active .header {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-18px);
+}
+
+/*
+Quando a introdução termina, o cabeçalho aparece.
+A regra é compatível caso o header já tenha transições.
+*/
+
+.header {
+    transition:
+        opacity 500ms ease,
+        visibility 500ms ease,
+        transform 500ms ease;
+}
+
+/* Animações */
+
+@keyframes logoScrollMouse {
+    0% {
+        opacity: 0;
+        transform: translate(-50%, 0);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    70% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translate(-50%, 10px);
+    }
+}
+
+/* Tablet e telemóvel */
+
+@media (max-width: 900px) {
+    :root {
+        --logo-scroll-height: 300vh;
+    }
+
+    .logo-scroll__sticky {
+        min-height: 500px;
+    }
+}
+
+@media (max-width: 600px) {
+    :root {
+        --logo-scroll-height: 270vh;
+    }
+
+    .logo-scroll__sticky {
+        min-height: 460px;
+    }
+
+    .logo-scroll__loading,
+    .logo-scroll__hint {
+        bottom: max(24px, env(safe-area-inset-bottom));
+    }
+
+    .logo-scroll__hint > span:first-child {
+        font-size: 8px;
+        letter-spacing: 0.22em;
+    }
+}
+
+/* Acessibilidade */
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-scroll {
+        height: 100svh;
+    }
+
+    .logo-scroll__sticky {
+        position: relative;
+    }
+
+    .logo-scroll__hint {
+        display: none;
+    }
+
+    .logo-scroll__canvas {
+        transition: none;
+    }
+}
+/* =========================================================
+   LOGO SCROLL → HERO
+   TRANSIÇÃO CINEMATOGRÁFICA ESTÁVEL
+   ========================================================= */
+
+/*
+Valores seguros por defeito.
+Mesmo que o JavaScript falhe, o hero permanece visível.
+*/
+
+.logo-scroll {
+    --logo-exit-progress: 0;
+    --logo-exit-opacity: 1;
+    --logo-exit-scale: 1;
+    --logo-exit-blur: 0px;
+    --transition-flash-opacity: 0;
+    --transition-flash-x: -120%;
+    position: relative;
+    z-index: 40;
+    margin-bottom: 0;
+}
+
+.logo-scroll__sticky {
+    isolation: isolate;
+}
+
+/* Canvas da sequência */
+
+.logo-scroll__canvas {
+    opacity: var(--logo-exit-opacity);
+    filter:
+        blur(var(--logo-exit-blur))
+        brightness(
+            calc(
+                1 +
+                var(--logo-exit-progress) * 0.12
+            )
+        );
+    transform:
+        translate3d(0, 0, 0)
+        scale(var(--logo-exit-scale));
+    transform-origin: center;
+    will-change:
+        opacity,
+        filter,
+        transform;
+}
+
+.logo-scroll.is-ready .logo-scroll__canvas {
+    opacity: var(--logo-exit-opacity);
+}
+
+/* Camada cinematográfica sobre os últimos frames */
+
+.logo-scroll__transition {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.logo-scroll__transition::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity:
+        calc(
+            var(--logo-exit-progress) * 0.62
+        );
+    background:
+        radial-gradient(
+            circle at center,
+            transparent 0%,
+            rgba(0, 0, 0, 0.12) 38%,
+            rgba(0, 0, 0, 0.86) 100%
+        );
+    will-change: opacity;
+}
+
+/* Feixe dourado */
+
+.logo-scroll__transition-light {
+    position: absolute;
+    top: -35%;
+    bottom: -35%;
+    left: var(--transition-flash-x);
+    width: 38%;
+    opacity: var(--transition-flash-opacity);
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            rgba(147, 91, 24, 0.05) 18%,
+            rgba(215, 164, 77, 0.28) 44%,
+            rgba(255, 236, 190, 0.9) 50%,
+            rgba(215, 164, 77, 0.24) 56%,
+            transparent 100%
+        );
+    filter: blur(35px);
+    mix-blend-mode: screen;
+    transform: rotate(-15deg);
+    will-change:
+        left,
+        opacity;
+}
+
+/* Linha de luz */
+
+.logo-scroll__transition-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: min(680px, 70vw);
+    height: 1px;
+    opacity: var(--transition-flash-opacity);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(211, 162, 80, 0.55),
+            rgba(255, 239, 204, 1),
+            rgba(211, 162, 80, 0.55),
+            transparent
+        );
+    box-shadow:
+        0 0 16px rgba(211, 162, 80, 0.75),
+        0 0 55px rgba(211, 162, 80, 0.3);
+    transform:
+        translate(-50%, -50%)
+        scaleX(
+            calc(
+                0.2 +
+                var(--logo-exit-progress) * 0.8
+            )
+        );
+    transform-origin: center;
+}
+
+/* Escurecimento final antes do hero */
+
+.logo-scroll__end-shade {
+    height: 34vh;
+    opacity:
+        calc(
+            0.45 +
+            var(--logo-exit-progress) * 0.55
+        );
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 0%,
+            rgba(3, 3, 3, 0.35) 38%,
+            #030303 100%
+        );
+}
+
+/* =========================================================
+   RESTAURAR O HERO
+   ========================================================= */
+
+.hero {
+    position: relative;
+    z-index: 20;
+    min-height: 100vh;
+    min-height: 100svh;
+
+    /*
+    Estes valores impedem o hero de ficar escondido,
+    mesmo que outra regra antiga ainda exista.
+    */
+
+    opacity: 1;
+    visibility: visible;
+    filter: none;
+    transform: none;
+}
+
+/* Garante que a fotografia recupera o tamanho original */
+
+.hero-frame {
+    opacity: 1;
+    visibility: visible;
+    filter: none;
+    transform: none;
+}
+
+/* Garante que o conteúdo textual fica visível */
+
+.hero-content,
+.hero .eyebrow,
+.hero-title,
+.hero-description,
+.hero .scroll-indicator {
+    visibility: visible;
+}
+
+/*
+As variáveis do novo JavaScript controlam apenas entradas
+verticais e opacidade, sempre com valor padrão 1.
+*/
+
+.hero-content {
+    opacity:
+        var(--hero-content-opacity, 1);
+    transform:
+        translate3d(
+            0,
+            var(--hero-content-y, 0px),
+            0
+        );
+    will-change:
+        transform,
+        opacity;
+}
+
+.hero-frame {
+    opacity:
+        var(--hero-image-opacity, 1);
+    transform:
+        translate3d(
+            0,
+            var(--hero-image-y, 0px),
+            0
+        )
+        scale(
+            var(--hero-image-scale, 1)
+        );
+    will-change:
+        transform,
+        opacity;
+}
+
+.hero-main-image {
+    filter:
+        brightness(
+            var(--hero-image-brightness, 1)
+        );
+    transition: none;
+}
+
+.hero-image-overlay {
+    opacity:
+        var(--hero-overlay-opacity, 0.42);
+}
+
+/* Linha dourada entre as secções */
+
+.hero::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    z-index: 5;
+    width:
+        var(--hero-top-line-width, 0%);
+    max-width: 720px;
+    height: 1px;
+    opacity:
+        var(--hero-top-line-opacity, 0);
+    background:
+        linear-gradient(
+            90deg,
+            transparent,
+            rgba(211, 162, 80, 0.7),
+            rgba(255, 235, 190, 1),
+            rgba(211, 162, 80, 0.7),
+            transparent
+        );
+    box-shadow:
+        0 0 25px rgba(211, 162, 80, 0.38);
+    transform: translateX(-50%);
+}
+
+/* Classe aplicada durante a passagem */
+
+.hero.hero-cinematic-enter {
+    overflow: hidden;
+}
+
+/* Os elementos devem terminar sempre totalmente visíveis */
+
+.hero.hero-cinematic-complete {
+    --hero-content-opacity: 1;
+    --hero-content-y: 0px;
+    --hero-image-opacity: 1;
+    --hero-image-y: 0px;
+    --hero-image-scale: 1;
+    --hero-image-brightness: 1;
+    --hero-overlay-opacity: 0.42;
+    --hero-top-line-opacity: 0;
+}
+
+/* Telemóvel */
+
+@media (max-width: 700px) {
+    .logo-scroll__transition-light {
+        width: 70%;
+    }
+
+    .logo-scroll__transition-line {
+        width: 78vw;
+    }
+}
+
+/* Movimento reduzido */
+
+@media (prefers-reduced-motion: reduce) {
+    .logo-scroll__canvas,
+    .hero,
+    .hero-frame,
+    .hero-content {
+        opacity: 1;
+        filter: none;
+        transform: none;
+    }
+
+    .logo-scroll__transition {
+        display: none;
+    }
+}
