@@ -1,0 +1,151 @@
+{
+  "site": {
+    "name": "Ângela Silva",
+    "title": "Punshon Studio | Fotografia, Vídeo e Conteúdo",
+    "description": "Fotografia, vídeo e criação de conteúdo para marcas, pessoas e projetos.",
+    "language": "pt"
+  },
+  "theme": {
+    "background": "#050505",
+    "surface": "#0b0b0b",
+    "gold": "#d3a250",
+    "goldLight": "#f2c56f",
+    "text": "#f5f2eb",
+    "muted": "#9a9a9a",
+    "lightSection": "#f1f0ec",
+    "lightSectionText": "#1a1a1a"
+  },
+  "navigation": {
+    "works": "Trabalhos",
+    "services": "Serviços",
+    "process": "Processo",
+    "about": "Sobre",
+    "contact": "Contacto"
+  },
+  "hero": {
+    "eyebrow": "Fotografia · Vídeo · Conteúdo",
+    "line1": "Transformo",
+    "line2": "momentos em",
+    "line3": "memórias.",
+    "description": "Imagens com intenção. Filmes com emoção. Conteúdo feito para ser sentido.",
+    "image": "images/hero/hero.jpg",
+    "scrollLabel": "Explorar"
+  },
+  "manifesto": {
+    "introduction": "Não se trata apenas de captar",
+    "line1": "O que os olhos",
+    "line2": "conseguem ver.",
+    "ending": "Trata-se de revelar o que sentimos."
+  },
+  "gallery": {
+    "eyebrow": "Selected Frames",
+    "title": "Histórias em movimento."
+  },
+  "imagine": {
+    "backgroundWord": "IMAGINE",
+    "smallText": "Ideia, luz e movimento.",
+    "title": "Criamos algo impossível de ignorar.",
+    "image": "images/transition/imagine.jpg"
+  },
+  "services": {
+    "eyebrow": "O que faço",
+    "title": "Uma visão. Várias formas de a contar.",
+    "items": [
+      {
+        "number": "01",
+        "name": "Fotografia",
+        "summary": "Retratos, campanhas, produto, moda e eventos.",
+        "introduction": "Imagens construídas para comunicar identidade, valor e personalidade, seja para uma pessoa, marca, produto ou evento.",
+        "contactLabel": "Pedir orçamento para fotografia"
+      },
+      {
+        "number": "02",
+        "name": "Vídeo",
+        "summary": "Filmes de marca, eventos, entrevistas e showreels.",
+        "introduction": "Vídeos pensados desde o conceito até à edição, com ritmo, cor e narrativa adaptados ao objetivo e à plataforma de publicação.",
+        "contactLabel": "Pedir orçamento para vídeo"
+      },
+      {
+        "number": "03",
+        "name": "Conteúdo digital",
+        "summary": "Conteúdo recorrente para redes sociais, campanhas e lançamentos.",
+        "introduction": "Produções que geram várias peças de conteúdo numa única sessão, criando consistência visual para Instagram, TikTok, LinkedIn e outras plataformas.",
+        "contactLabel": "Pedir proposta de conteúdo"
+      }
+    ]
+  },
+  "process": {
+    "eyebrow": "Como funciona",
+    "title": "Da primeira ideia à entrega final.",
+    "introduction": "Um processo simples, transparente e pensado para transformar objetivos em imagens com identidade.",
+    "items": [
+      {
+        "number": "01",
+        "title": "Briefing",
+        "description": "Falamos sobre a marca, o público, o objetivo, os formatos necessários e o local da produção."
+      },
+      {
+        "number": "02",
+        "title": "Conceito",
+        "description": "Definimos a direção visual, referências, enquadramentos, cores e narrativa do projeto."
+      },
+      {
+        "number": "03",
+        "title": "Produção",
+        "description": "Captamos fotografia e vídeo segundo o planeamento, mantendo espaço para momentos naturais e novas ideias."
+      },
+      {
+        "number": "04",
+        "title": "Entrega",
+        "description": "O conteúdo é selecionado, editado e entregue nos formatos adequados para o site, campanhas e redes sociais."
+      }
+    ]
+  },
+  "showreel": {
+    "eyebrow": "Film · Motion · Emotion",
+    "title": "Cada segundo tem intenção.",
+    "video": "videos/showreel.mp4",
+    "poster": "images/video/showreel-cover.jpg",
+    "year": "2026"
+  },
+  "about": {
+    "eyebrow": "Por trás da câmara",
+    "title": "Olá, sou a pessoa que transforma a tua ideia numa imagem com identidade.",
+    "description": "Trabalho entre fotografia, vídeo e conteúdo digital para criar narrativas que continuam vivas depois de o ecrã mudar.",
+    "linkLabel": "Conhecer o meu trabalho",
+    "image": "images/about/fotografa.jpg"
+  },
+  "contact": {
+    "eyebrow": "Vamos criar",
+    "title": "Conta-me a tua ideia.",
+    "description": "Partilha os detalhes essenciais do projeto. Receberás uma resposta com disponibilidade, próximos passos e uma proposta adequada.",
+    "email": "leonardopunshonep@gmail.com",
+    "submitLabel": "Enviar pedido"
+  },
+  "social": {
+    "instagram": "https://www.instagram.com/UTILIZADOR",
+    "tiktok": "https://www.tiktok.com/@UTILIZADOR",
+    "vimeo": "https://vimeo.com/UTILIZADOR"
+  },
+  "footer": {
+    "copyright": "PUNSHONSTUDIO"
+  },
+  "images": {
+    "hero": "images/hero/hero.jpg",
+    "about": "images/about/fotografa.jpg",
+    "imagine": "images/transition/imagine.jpg",
+    "showreelPoster": "images/video/showreel-cover.jpg",
+    "portfolio1": "images/portfolio/projeto-01.jpg",
+    "portfolio2": "images/portfolio/projeto-02.jpg",
+    "portfolio3": "images/portfolio/projeto-03.jpg",
+    "portfolio4": "images/portfolio/projeto-04.jpg",
+    "portfolio5": "images/portfolio/projeto-05.jpg",
+    "portfolio6": "images/portfolio/projeto-06.jpg",
+    "gallery1": "images/gallery/galeria-01.jpg",
+    "gallery2": "images/gallery/galeria-02.jpg",
+    "gallery3": "images/gallery/galeria-03.jpg",
+    "gallery4": "images/gallery/galeria-04.jpg",
+    "gallery5": "images/gallery/galeria-05.jpg",
+    "gallery6": "images/gallery/galeria-06.jpg"
+  }
+}

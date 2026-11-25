@@ -7140,3 +7140,23 @@ verticais e opacidade, sempre com valor padrão 1.
         display: none;
     }
 }
+/* =========================================================
+   CORES CONTROLADAS PELO SISTEMA DE CONTEÚDO
+   ========================================================= */
+
+:root {
+    --admin-background: #050505;
+    --admin-surface: #0b0b0b;
+    --admin-gold: #d3a250;
+    --admin-gold-light: #f2c56f;
+    --admin-text: #f5f2eb;
+    --admin-muted: #9a9a9a;
+    --admin-light-section: #f1f0ec;
+    --admin-light-section-text: #1a1a1a;
+}
+
+
+
+.content-load-error::before {
+    content: "";
+}
