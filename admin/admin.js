@@ -31,6 +31,11 @@
 
     const resetButton =
         document.querySelector("#admin-reset");
+        const previewButton =
+    document.querySelector("#admin-preview");
+
+const PREVIEW_STORAGE_KEY =
+    "punshonstudio_admin_preview";
 
     const toast =
         document.querySelector("#admin-toast");
@@ -855,6 +860,63 @@
             }
         }
     }
+    /* =====================================================
+   PRÉ-VISUALIZAÇÃO LOCAL
+   ===================================================== */
+
+function savePreviewContent(content) {
+    try {
+        localStorage.setItem(
+            PREVIEW_STORAGE_KEY,
+            JSON.stringify(content)
+        );
+
+        return true;
+    } catch (error) {
+        console.error(
+            "Não foi possível guardar a pré-visualização:",
+            error
+        );
+
+        return false;
+    }
+}
+
+function openPreview() {
+    try {
+        const content =
+            collectFormData();
+
+        validateContent(content);
+
+        const saved =
+            savePreviewContent(content);
+
+        if (!saved) {
+            throw new Error(
+                "O navegador não conseguiu guardar a pré-visualização."
+            );
+        }
+
+        const previewUrl =
+            `../index.html?admin-preview=${Date.now()}`;
+
+        window.open(
+            previewUrl,
+            "_blank",
+            "noopener"
+        );
+
+        showToast(
+            "Pré-visualização aberta num novo separador."
+        );
+    } catch (error) {
+        showToast(
+            error.message,
+            "error"
+        );
+    }
+}
 
     /* =====================================================
        EXPORTAR JSON
@@ -1139,6 +1201,12 @@
                     resetContent
                 );
             }
+            if (previewButton) {
+    previewButton.addEventListener(
+        "click",
+        openPreview
+    );
+}
 
             updateChangeState(false);
 

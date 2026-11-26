@@ -7,6 +7,8 @@
     "use strict";
 
     const CONTENT_URL = "content/site.json";
+    const PREVIEW_STORAGE_KEY =
+    "punshonstudio_admin_preview";
 
     /*
     Estas funções atualizam elementos apenas quando eles
@@ -1054,59 +1056,131 @@
             )
         );
     }
+    function getPreviewContent() {
+    const parameters =
+        new URLSearchParams(
+            window.location.search
+        );
+
+    if (!parameters.has("admin-preview")) {
+        return null;
+    }
+
+    try {
+        const storedContent =
+            localStorage.getItem(
+                PREVIEW_STORAGE_KEY
+            );
+
+        if (!storedContent) {
+            return null;
+        }
+
+        const parsedContent =
+            JSON.parse(storedContent);
+
+        if (
+            !parsedContent ||
+            typeof parsedContent !== "object"
+        ) {
+            return null;
+        }
+
+        return parsedContent;
+    } catch (error) {
+        console.error(
+            "Erro ao abrir a pré-visualização:",
+            error
+        );
+
+        return null;
+    }
+}
+
+function showPreviewIndicator() {
+    const indicator =
+        document.createElement("div");
+
+    indicator.className =
+        "admin-preview-indicator";
+
+    indicator.innerHTML = `
+        <span>Pré-visualização do painel</span>
+
+        <a href="index.html">
+            Fechar pré-visualização
+        </a>
+    `;
+
+    document.body.appendChild(
+        indicator
+    );
+}
 
     // =====================================================
     // CARREGAR O JSON
     // =====================================================
 
-    async function loadContent() {
-        try {
-            const response = await fetch(
-                `${CONTENT_URL}?v=${Date.now()}`,
-                {
-                    cache: "no-store"
-                }
-            );
+   async function loadContent() {
+    try {
+        const previewContent =
+            getPreviewContent();
 
-            if (!response.ok) {
-                throw new Error(
-                    `Não foi possível carregar ${CONTENT_URL}. ` +
-                    `Estado HTTP: ${response.status}`
-                );
-            }
-
-            const content =
-                await response.json();
-
-            applyContent(content);
-        } catch (error) {
-            /*
-            O site continua a funcionar com o conteúdo
-            original escrito no HTML.
-            */
-
-            console.error(
-                "Erro ao carregar o conteúdo editável:",
-                error
+        if (previewContent) {
+            applyContent(
+                previewContent
             );
 
             document.documentElement.classList.add(
-                "content-load-error"
+                "admin-preview-mode"
             );
 
-            document.dispatchEvent(
-                new CustomEvent(
-                    "punshon:content-error",
-                    {
-                        detail: {
-                            message:
-                                error.message
-                        }
-                    }
-                )
+            showPreviewIndicator();
+
+            return;
+        }
+
+        const response = await fetch(
+            `${CONTENT_URL}?v=${Date.now()}`,
+            {
+                cache: "no-store"
+            }
+        );
+
+        if (!response.ok) {
+            throw new Error(
+                `Não foi possível carregar ${CONTENT_URL}. ` +
+                `Estado HTTP: ${response.status}`
             );
         }
+
+        const content =
+            await response.json();
+
+        applyContent(content);
+    } catch (error) {
+        console.error(
+            "Erro ao carregar o conteúdo editável:",
+            error
+        );
+
+        document.documentElement.classList.add(
+            "content-load-error"
+        );
+
+        document.dispatchEvent(
+            new CustomEvent(
+                "punshon:content-error",
+                {
+                    detail: {
+                        message:
+                            error.message
+                    }
+                }
+            )
+        );
     }
+}
 
     /*
     O script é carregado no final do body, mas esta

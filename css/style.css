@@ -7160,3 +7160,835 @@ verticais e opacidade, sempre com valor padrão 1.
 .content-load-error::before {
     content: "";
 }
+/* =========================================================
+   AVISO DE PRÉ-VISUALIZAÇÃO DO PAINEL
+   ========================================================= */
+
+.admin-preview-indicator {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 13px 15px;
+    border: 1px solid rgba(211, 162, 80, 0.38);
+    color: #f5f2eb;
+    background: rgba(10, 10, 10, 0.94);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.42);
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
+    backdrop-filter: blur(18px);
+}
+
+.admin-preview-indicator span {
+    color: #d3a250;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+.admin-preview-indicator a {
+    color: rgba(255, 255, 255, 0.72);
+    font-size: 0.68rem;
+    text-decoration: none;
+}
+
+.admin-preview-indicator a:hover {
+    color: #ffffff;
+}
+
+@media (max-width: 600px) {
+    .admin-preview-indicator {
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        justify-content: space-between;
+    }
+}
+/* =========================================================
+   ENTRADA NA HISTÓRIA
+========================================================= */
+
+.story-reveal {
+    min-height: 100svh;
+
+    display: grid;
+    place-items: center;
+
+    overflow: hidden;
+
+    text-align: center;
+
+    background: var(--blue-deep);
+
+    isolation: isolate;
+}
+
+.story-reveal-background,
+.story-reveal-overlay {
+    position: absolute;
+    inset: 0;
+}
+
+.story-reveal-background {
+    z-index: -2;
+}
+
+.story-reveal-background img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    filter:
+        brightness(0.5)
+        saturate(0.82);
+
+    transform: scale(1.04);
+}
+
+.story-reveal-overlay {
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(55, 120, 180, 0.12),
+            transparent 45%
+        ),
+        rgba(3, 13, 28, 0.65);
+
+    z-index: -1;
+}
+
+.story-reveal-content {
+    position: relative;
+
+    width:
+        min(calc(100% - 40px), 1200px);
+
+    z-index: 2;
+}
+
+.story-reveal-content > span {
+    display: block;
+
+    color: var(--gold);
+
+    font-size: 0.72rem;
+    letter-spacing: 5px;
+}
+
+.story-reveal-content h2 {
+    margin: 25px 0;
+
+    color: #ffffff;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size:
+        clamp(4rem, 10vw, 9rem);
+
+    font-weight: 400;
+    line-height: 0.85;
+    letter-spacing: -0.04em;
+}
+
+.story-reveal-content p {
+    max-width: 650px;
+
+    margin:
+        0 auto;
+
+    color: var(--text-soft);
+
+    line-height: 1.8;
+}
+
+.story-reveal-content a {
+    display: inline-flex;
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 30px;
+    padding: 15px 24px;
+
+    color: var(--blue-deep);
+    background: var(--gold);
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.3s ease,
+        transform 0.3s ease;
+}
+
+.story-reveal-content a:hover {
+    background: var(--gold-light);
+
+    transform:
+        translateY(-3px);
+}
+
+
+/* =========================================================
+   EXPERIÊNCIA
+========================================================= */
+
+.depth-experience {
+    overflow: visible;
+
+    background: var(--blue-deep);
+
+    isolation: isolate;
+}
+
+
+/* =========================================================
+   TRANSIÇÃO IMERSIVA
+========================================================= */
+
+.depth-transition {
+    width: 100%;
+    height: 220vh;
+
+    margin: 0;
+    padding: 0;
+
+    background: var(--blue-deep);
+
+    isolation: isolate;
+}
+
+.depth-transition-stage {
+    position: sticky;
+    top: 0;
+
+    width: 100%;
+    height: 100svh;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 44%,
+            rgba(45, 108, 169, 0.22),
+            transparent 42%
+        ),
+        linear-gradient(
+            180deg,
+            #07182f,
+            var(--blue-deep)
+        );
+
+    isolation: isolate;
+}
+
+.depth-transition-ambient {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(1050px, 95vw);
+
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(65, 132, 194, 0.2),
+            rgba(212, 176, 106, 0.04) 30%,
+            transparent 68%
+        );
+
+    opacity: 0.8;
+
+    filter: blur(28px);
+
+    transform:
+        translate(-50%, -50%)
+        scale(0.8);
+
+    pointer-events: none;
+
+    will-change:
+        transform,
+        opacity;
+
+    z-index: 0;
+}
+
+.depth-transition-copy {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+
+    width:
+        min(92vw, 1100px);
+
+    color: #ffffff;
+
+    text-align: center;
+
+    opacity: 1;
+
+    transform:
+        translate3d(-50%, -50%, 0)
+        scale(1);
+
+    transform-origin:
+        center center;
+
+    will-change:
+        transform,
+        opacity,
+        filter;
+
+    z-index: 4;
+}
+
+.depth-transition-eyebrow {
+    display: block;
+
+    margin-bottom: 24px;
+
+    font-size:
+        clamp(0.62rem, 0.8vw, 0.76rem);
+
+    font-weight: 500;
+    letter-spacing: 7px;
+}
+
+.depth-transition-copy h2 {
+    max-width: 1050px;
+
+    margin: 0 auto;
+
+    color: #ffffff;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size:
+        clamp(4.5rem, 9vw, 9rem);
+
+    font-weight: 400;
+    line-height: 0.82;
+    letter-spacing: -0.045em;
+
+    text-shadow:
+        0 8px 35px
+        rgba(0, 0, 0, 0.65);
+}
+
+.depth-transition-copy p {
+    max-width: 680px;
+
+    margin:
+        30px auto 0;
+
+    color: var(--text-soft);
+
+    font-size:
+        clamp(1rem, 1.3vw, 1.14rem);
+
+    line-height: 1.8;
+}
+
+.depth-transition-scroll-hint {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 30px;
+
+    color:
+        rgba(255, 255, 255, 0.55);
+
+    font-size: 0.58rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+.depth-transition-scroll-arrow {
+    color: var(--gold);
+
+    font-size: 1rem;
+
+    animation:
+        depthTransitionArrow
+        1.7s ease-in-out infinite;
+}
+
+@keyframes depthTransitionArrow {
+    0%,
+    100% {
+        opacity: 0.4;
+
+        transform:
+            translateY(0);
+    }
+
+    50% {
+        opacity: 1;
+
+        transform:
+            translateY(9px);
+    }
+}
+
+
+/* Imagem da transição */
+
+.depth-transition-window {
+    position: absolute;
+    top: 108%;
+    left: 50%;
+
+    width: 58vw;
+    height: 48svh;
+
+    max-width: none;
+    max-height: none;
+
+    overflow: hidden;
+
+    margin: 0;
+
+    opacity: 0;
+
+    background: #07182f;
+
+    border:
+        1px solid
+        rgba(212, 176, 106, 0.42);
+
+    border-radius: 30px;
+
+    box-shadow:
+        0 45px 140px
+        rgba(0, 2, 10, 0.82),
+        0 0 80px
+        rgba(53, 121, 184, 0.14);
+
+    transform:
+        translate3d(-50%, -50%, 0)
+        scale(0.76);
+
+    transform-origin:
+        center center;
+
+    will-change:
+        top,
+        width,
+        height,
+        opacity,
+        transform,
+        border-radius;
+
+    z-index: 6;
+}
+
+.depth-transition-image-shell {
+    position: absolute;
+    inset: 0;
+
+    overflow: hidden;
+
+    border-radius: inherit;
+}
+
+.depth-transition-image {
+    display: block;
+
+    width: 100%;
+    max-width: none;
+    height: 100%;
+
+    object-fit: cover;
+    object-position: center;
+
+    filter:
+        brightness(0.68)
+        saturate(0.9)
+        contrast(1.06);
+
+    transform:
+        scale(1.18);
+
+    transform-origin:
+        center center;
+
+    will-change:
+        transform,
+        filter;
+}
+
+.depth-transition-image-overlay {
+    position: absolute;
+    inset: 0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(3, 13, 28, 0.04),
+            transparent 42%,
+            rgba(3, 13, 28, 0.65)
+        );
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+.depth-transition-image-light {
+    position: absolute;
+    top: -20%;
+    left: -40%;
+
+    width: 42%;
+    height: 150%;
+
+    opacity: 0;
+
+    background:
+        linear-gradient(
+            105deg,
+            transparent,
+            rgba(255, 238, 193, 0.08),
+            rgba(255, 255, 255, 0.22),
+            rgba(255, 238, 193, 0.06),
+            transparent
+        );
+
+    filter: blur(12px);
+
+    transform:
+        rotate(8deg);
+
+    pointer-events: none;
+
+    will-change:
+        transform,
+        opacity;
+
+    z-index: 3;
+}
+
+.depth-transition-window figcaption {
+    position: absolute;
+    right: 28px;
+    bottom: 24px;
+    left: 28px;
+
+    color: #ffffff;
+
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 5px;
+
+    text-shadow:
+        0 3px 16px
+        rgba(0, 0, 0, 0.95);
+
+    z-index: 5;
+}
+
+.depth-transition-curtain {
+    position: absolute;
+    inset: 0;
+
+    opacity: 0;
+
+    background:
+        rgba(3, 13, 28, 0.8);
+
+    pointer-events: none;
+
+    will-change: opacity;
+
+    z-index: 8;
+}
+
+.depth-transition-progress {
+    position: absolute;
+    right: 7vw;
+    bottom: 28px;
+    left: 7vw;
+
+    height: 1px;
+
+    overflow: hidden;
+
+    background:
+        rgba(255, 255, 255, 0.14);
+
+    z-index: 12;
+}
+
+
+/* =========================================================
+   GALERIA EM PROFUNDIDADE
+========================================================= */
+
+.depth-scroll {
+  position: relative;
+  height: 720vh;
+
+
+    margin: 0;
+    padding: 0;
+}
+
+.depth-stage {
+    position: sticky;
+    top: 0;
+
+    width: 100%;
+    height: 100svh;
+
+    overflow: hidden;
+
+    perspective: 1200px;
+    transform-style: preserve-3d;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(21, 60, 104, 0.45),
+            transparent 45%
+        ),
+        var(--blue-deep);
+}
+
+.depth-light {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width: 100px;
+    aspect-ratio: 1;
+
+    border-radius: 50%;
+
+    background:
+        radial-gradient(
+            circle,
+            var(--gold-light),
+            rgba(212, 176, 106, 0.22) 30%,
+            transparent 70%
+        );
+
+    filter: blur(8px);
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+}
+
+.depth-card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width:
+        clamp(240px, 32vw, 520px);
+
+    aspect-ratio: 1.45;
+
+    overflow: hidden;
+
+    background: #07182f;
+
+    border:
+        1px solid
+        rgba(212, 176, 106, 0.38);
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 35px 100px
+        rgba(0, 5, 18, 0.72),
+        0 0 35px
+        rgba(52, 123, 188, 0.1);
+
+    opacity: 0;
+
+    pointer-events: none;
+
+    will-change:
+        transform,
+        opacity,
+        filter;
+}
+
+.depth-card img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: cover;
+
+    border-radius: inherit;
+
+    filter:
+        brightness(0.76)
+        saturate(0.94)
+        contrast(1.04);
+}
+
+.depth-card::after {
+    content: "";
+
+    position: absolute;
+    inset: 0;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            180deg,
+            transparent 60%,
+            rgba(3, 13, 28, 0.08) 72%,
+            rgba(3, 13, 28, 0.78) 100%
+        );
+
+    pointer-events: none;
+
+    z-index: 2;
+}
+
+.depth-card > span {
+    position: absolute;
+    right: 20px;
+    bottom: 16px;
+    left: 20px;
+
+    color: #ffffff;
+
+    font-size: 0.6rem;
+    font-weight: 500;
+    letter-spacing: 3px;
+
+    text-shadow:
+        0 2px 10px
+        rgba(0, 0, 0, 0.95);
+
+    z-index: 3;
+}
+
+.depth-copy {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+
+    width:
+        min(92vw, 950px);
+
+    color: #ffffff;
+
+    text-align: center;
+
+    transform:
+        translate(-50%, -50%);
+
+    pointer-events: none;
+
+    z-index: 500;
+}
+
+.depth-copy > span {
+    display: block;
+
+    margin-bottom: 14px;
+
+    color: var(--gold);
+
+    font-size:
+        clamp(0.65rem, 0.8vw, 0.76rem);
+
+    font-weight: 500;
+    letter-spacing: 7px;
+
+    text-shadow:
+        0 2px 8px
+        var(--blue-deep),
+        0 0 18px
+        var(--blue-deep);
+}
+
+.depth-copy h2 {
+    max-width: 950px;
+
+    margin:
+        0 auto
+        16px;
+
+    color: #ffffff;
+
+    font-family:
+        "Cormorant Garamond",
+        serif;
+
+    font-size:
+        clamp(4.2rem, 9vw, 8.5rem);
+
+    font-weight: 400;
+    line-height: 0.84;
+    letter-spacing: -0.04em;
+
+    text-shadow:
+        0 8px 25px
+        rgba(0, 0, 0, 0.95),
+        0 0 55px
+        rgba(3, 13, 28, 0.92);
+}
+
+.depth-copy p {
+    max-width: 600px;
+
+    margin: 0 auto;
+
+    color: #e1e9f2;
+
+    font-size:
+        clamp(0.98rem, 1.3vw, 1.12rem);
+
+    line-height: 1.7;
+
+    text-shadow:
+        0 5px 18px
+        rgba(0, 0, 0, 0.95);
+}
+
+.depth-progress {
+    position: absolute;
+    right: 7vw;
+    bottom: 35px;
+    left: 7vw;
+
+    height: 1px;
+
+    background:
+        rgba(255, 255, 255, 0.16);
+
+    z-index: 550;
+}
+.depth-scroll .depth-stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow: hidden;
+}

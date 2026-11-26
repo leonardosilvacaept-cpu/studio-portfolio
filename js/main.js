@@ -131,48 +131,79 @@ const projects = [
 // FUNÇÕES GERAIS
 // ======================================================
 
+const select = (selector, parent = document) => {
+  return parent.querySelector(selector);
+};
+
+const selectAll = (selector, parent = document) => {
+  return Array.from(
+    parent.querySelectorAll(selector)
+  );
+};
+
 const clamp = (
-    value,
-    minimum = 0,
-    maximum = 1
+  value,
+  minimum = 0,
+  maximum = 1
 ) => {
-    return Math.min(
-        Math.max(value, minimum),
-        maximum
-    );
+  return Math.min(
+    Math.max(value, minimum),
+    maximum
+  );
+};
+
+const lerp = (start, end, amount) => {
+  return start + (end - start) * amount;
 };
 
 const smoothStep = (value) => {
-    const progress = clamp(value);
+  const progress = clamp(value);
 
-    return (
-        progress *
-        progress *
-        (3 - 2 * progress)
-    );
+  return (
+    progress *
+    progress *
+    (3 - 2 * progress)
+  );
 };
 
 const progressThroughSection = (section) => {
-    if (!section) {
-        return 0;
-    }
+  if (!section) {
+    return 0;
+  }
 
-    const rectangle =
-        section.getBoundingClientRect();
+  const rectangle =
+    section.getBoundingClientRect();
 
-    const availableDistance =
-        rectangle.height -
-        window.innerHeight;
+  const availableDistance =
+    rectangle.height -
+    window.innerHeight;
 
-    if (availableDistance <= 0) {
-        return 0;
-    }
+  if (availableDistance <= 0) {
+    return 0;
+  }
 
-    return clamp(
-        -rectangle.top /
-        availableDistance
-    );
+  return clamp(
+    -rectangle.top /
+    availableDistance
+  );
 };
+
+// ======================================================
+// GSAP
+// ======================================================
+
+const hasGsap =
+  typeof window.gsap !== "undefined";
+
+const hasScrollTrigger =
+  typeof window.ScrollTrigger !== "undefined";
+
+if (hasGsap && hasScrollTrigger) {
+  window.gsap.registerPlugin(
+    window.ScrollTrigger
+  );
+}
+
 
 // ======================================================
 // PRELOADER
@@ -811,6 +842,7 @@ const updateManifesto = () => {
             }px)`;
     }
 };
+
 
 // ======================================================
 // TÚNEL 3D LUXURY
@@ -4786,4 +4818,667 @@ function updateFromScroll() {
             loadRemainingFrames();
             requestScrollUpdate();
         });
+        // ======================================================
+    // TRANSIÇÃO IMERSIVA
+    // ======================================================
+
+    const depthTransition =
+        select("#depth-transition");
+
+    const depthTransitionCopy =
+        select(".depth-transition-copy");
+
+    const depthTransitionWindow =
+        select(".depth-transition-window");
+
+    const depthTransitionImage =
+        select(".depth-transition-image");
+
+    const depthTransitionLight =
+        select(".depth-transition-image-light");
+
+    const depthTransitionCaption = select(
+        ".depth-transition-window figcaption"
+    );
+
+    const depthTransitionCurtain =
+        select(".depth-transition-curtain");
+
+    const depthTransitionAmbient =
+        select(".depth-transition-ambient");
+
+    const depthTransitionProgressFill = select(
+        ".depth-transition-progress span"
+    );
+
+    let depthTransitionTarget = 0;
+    let depthTransitionCurrent = 0;
+
+    function calculateDepthTransitionProgress() {
+        if (!depthTransition) {
+            return;
+        }
+
+        const rect =
+            depthTransition.getBoundingClientRect();
+
+        const scrollDistance = Math.max(
+            depthTransition.offsetHeight -
+            window.innerHeight,
+            1
+        );
+
+        depthTransitionTarget = clamp(
+            -rect.top / scrollDistance
+        );
+    }
+
+    function renderDepthTransition(progress) {
+        const imageEntry = smoothStep(
+            clamp((progress - 0.08) / 0.34)
+        );
+
+        const imageExpansion = smoothStep(
+            clamp((progress - 0.34) / 0.38)
+        );
+
+        const textExit = smoothStep(
+            clamp((progress - 0.16) / 0.3)
+        );
+
+        const finalPhase = smoothStep(
+            clamp((progress - 0.78) / 0.22)
+        );
+
+        if (depthTransitionCopy) {
+            const opacity = 1 - textExit;
+            const translateY = lerp(0, -110, textExit);
+            const scale = lerp(1, 0.88, textExit);
+            const blur = lerp(0, 12, textExit);
+
+            depthTransitionCopy.style.opacity =
+                opacity.toFixed(3);
+
+            depthTransitionCopy.style.filter =
+                `blur(${blur}px)`;
+
+            depthTransitionCopy.style.transform = `
+                translate3d(
+                    -50%,
+                    calc(-50% + ${translateY}px),
+                    0
+                )
+                scale(${scale})
+            `;
+        }
+
+        if (depthTransitionWindow) {
+            const top =
+                lerp(108, 50, imageEntry);
+
+            const width =
+                lerp(58, 102, imageExpansion);
+
+            const height =
+                lerp(48, 102, imageExpansion);
+
+            const entryScale =
+                lerp(0.76, 1, imageEntry);
+
+            const finalScale =
+                lerp(
+                    entryScale,
+                    1.03,
+                    imageExpansion
+                );
+
+            const borderRadius =
+                lerp(30, 0, imageExpansion);
+
+            const opacity =
+                clamp(imageEntry * 1.7);
+
+            depthTransitionWindow.style.top =
+                `${top}%`;
+
+            depthTransitionWindow.style.width =
+                `${width}vw`;
+
+            depthTransitionWindow.style.height =
+                `${height}svh`;
+
+            depthTransitionWindow.style.opacity =
+                opacity.toFixed(3);
+
+            depthTransitionWindow.style.borderRadius =
+                `${borderRadius}px`;
+
+            depthTransitionWindow.style.transform = `
+                translate3d(-50%, -50%, 0)
+                scale(${finalScale})
+            `;
+        }
+
+        if (depthTransitionImage) {
+            const firstScale =
+                lerp(1.18, 1.04, imageExpansion);
+
+            const finalScale =
+                firstScale + finalPhase * 0.06;
+
+            const brightness =
+                lerp(
+                    0.68,
+                    0.84,
+                    imageExpansion
+                ) -
+                finalPhase * 0.16;
+
+            depthTransitionImage.style.transform =
+                `scale(${finalScale})`;
+
+            depthTransitionImage.style.filter = `
+                brightness(${brightness})
+                saturate(0.94)
+                contrast(1.06)
+            `;
+        }
+
+        if (depthTransitionAmbient) {
+            const scale =
+                lerp(0.8, 1.16, progress);
+
+            depthTransitionAmbient.style.transform = `
+                translate(-50%, -50%)
+                scale(${scale})
+            `;
+        }
+
+        if (depthTransitionLight) {
+            const lightEntry = clamp(
+                (progress - 0.42) / 0.3
+            );
+
+            const lightExit = clamp(
+                (progress - 0.72) / 0.16
+            );
+
+            const opacity =
+                lightEntry * (1 - lightExit);
+
+            const translateX =
+                lerp(-30, 170, lightEntry);
+
+            depthTransitionLight.style.opacity =
+                opacity.toFixed(3);
+
+            depthTransitionLight.style.transform = `
+                translateX(${translateX}vw)
+                rotate(8deg)
+            `;
+        }
+
+        if (depthTransitionCaption) {
+            const captionExit = clamp(
+                (progress - 0.66) / 0.18
+            );
+
+            depthTransitionCaption.style.opacity =
+                String(1 - captionExit);
+
+            depthTransitionCaption.style.transform =
+                `translateY(${captionExit * 20}px)`;
+        }
+
+        if (depthTransitionCurtain) {
+            depthTransitionCurtain.style.opacity =
+                String(finalPhase * 0.7);
+        }
+
+        if (depthTransitionProgressFill) {
+            depthTransitionProgressFill.style.transform =
+                `scaleX(${progress})`;
+        }
+    }
+
+    function animateDepthTransition() {
+        if (!depthTransition) {
+            return;
+        }
+
+        depthTransitionCurrent = lerp(
+            depthTransitionCurrent,
+            depthTransitionTarget,
+            0.09
+        );
+
+        if (
+            Math.abs(
+                depthTransitionTarget -
+                depthTransitionCurrent
+            ) < 0.00005
+        ) {
+            depthTransitionCurrent =
+                depthTransitionTarget;
+        }
+
+        renderDepthTransition(
+            depthTransitionCurrent
+        );
+
+        window.requestAnimationFrame(
+            animateDepthTransition
+        );
+    }
+
+    if (depthTransition) {
+        calculateDepthTransitionProgress();
+
+        depthTransitionCurrent =
+            depthTransitionTarget;
+
+        renderDepthTransition(
+            depthTransitionCurrent
+        );
+
+        window.addEventListener(
+            "scroll",
+            calculateDepthTransitionProgress,
+            { passive: true }
+        );
+
+        window.addEventListener(
+            "resize",
+            calculateDepthTransitionProgress
+        );
+
+        window.requestAnimationFrame(
+            animateDepthTransition
+        );
+    }
+
+    // ======================================================
+    // GALERIA EM PROFUNDIDADE
+    // ======================================================
+
+    const depthScroll =
+        select("#depth-scroll");
+
+    const depthStage =
+        select(".depth-stage");
+
+    const depthCards =
+        selectAll(".depth-card");
+
+    const depthCounter =
+        select("#depth-counter");
+
+    const depthTitle =
+        select("#depth-title");
+
+    const depthDescription =
+        select("#depth-description");
+
+    const depthProgressFill =
+        select("#depth-progress-fill");
+
+    const depthLight =
+        select(".depth-light");
+        
+
+    const depthScenes = [
+        {
+            title: "Retratos",
+            description:
+                "Presença, identidade e expressão em cada enquadramento."
+        },
+        {
+            title: "Campanhas",
+            description:
+                "Imagens pensadas para fortalecer a identidade das marcas."
+        },
+        {
+            title: "Editorial",
+            description:
+                "Moda, composição e movimento numa narrativa visual."
+        },
+        {
+            title: "Produto",
+            description:
+                "Luz, matéria e detalhe ao serviço da comunicação."
+        },
+        {
+            title: "Conteúdo",
+            description:
+                "Fotografia e vídeo preparados para as redes sociais."
+        },
+        {
+            title: "Movimento",
+            description:
+                "Vídeos com ritmo, intenção e identidade."
+        }
+    ];
+
+    let depthTargetProgress = 0;
+    let depthCurrentProgress = 0;
+    let activeDepthScene = -1;
+
+    function calculateDepthProgress() {
+        if (!depthScroll) {
+            return;
+        }
+
+        const rect =
+            depthScroll.getBoundingClientRect();
+
+        const scrollDistance = Math.max(
+            depthScroll.offsetHeight -
+            window.innerHeight,
+            1
+        );
+
+        depthTargetProgress = clamp(
+            -rect.top / scrollDistance
+        );
+    }
+    
+
+    function setDepthScene(index) {
+        if (
+            index === activeDepthScene ||
+            index < 0 ||
+            index >= depthScenes.length
+        ) {
+            return;
+        }
+
+        activeDepthScene = index;
+
+        const scene = depthScenes[index];
+
+        if (depthCounter) {
+            depthCounter.textContent =
+                `${String(index + 1).padStart(2, "0")} / ` +
+                `${String(depthScenes.length).padStart(2, "0")}`;
+        }
+
+        if (depthTitle) {
+            depthTitle.textContent =
+                scene.title;
+        }
+
+        if (depthDescription) {
+            depthDescription.textContent =
+                scene.description;
+        }
+
+        if (hasGsap) {
+            const validElements = [
+                depthCounter,
+                depthTitle,
+                depthDescription
+            ].filter(Boolean);
+
+            window.gsap.fromTo(
+                validElements,
+                {
+                    opacity: 0,
+                    y: 20,
+                    filter: "blur(8px)"
+                },
+                {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                    duration: 0.85,
+                    stagger: 0.07,
+                    ease: "power3.out",
+                    overwrite: true
+                }
+            );
+        }
+    }
+
+    function renderDepthCards(progress) {
+        const total = depthCards.length;
+
+        if (total === 0) {
+            return;
+        }
+
+        depthCards.forEach((card, index) => {
+          const start =
+  index / total - 0.1;
+
+const isLastCard =
+  index === total - 1;
+
+const duration =
+  isLastCard
+    ? 0.24
+    : 0.44;
+
+const localProgress = clamp(
+  (progress - start) / duration
+);
+
+const eased =
+  smoothStep(localProgress);
+
+const xDirection = Number(
+  card.dataset.x || 0
+);
+
+const yDirection = Number(
+  card.dataset.y || 0
+);
+
+const spread = Math.sin(
+  localProgress * Math.PI
+);
+
+const z = lerp(
+  -4200,
+  1200,
+  eased
+);
+
+const x =
+  xDirection *
+  spread *
+  Math.min(
+    window.innerWidth * 0.3,
+    430
+  );
+
+const y =
+  yDirection *
+  spread *
+  Math.min(
+    window.innerHeight * 0.22,
+    220
+  );
+
+const fadeIn = clamp(
+  localProgress / 0.18
+);
+
+const fadeOut = isLastCard
+  ? 1
+  : 1 -
+    clamp(
+      (localProgress - 0.82) /
+      0.18
+    );
+
+const opacity =
+  fadeIn * fadeOut;
+
+            let blur = 0;
+
+            if (localProgress < 0.25) {
+                blur =
+                    (
+                        1 -
+                        localProgress / 0.25
+                    ) * 10;
+            } else if (localProgress > 0.84) {
+                blur =
+                    (
+                        (localProgress - 0.84) /
+                        0.16
+                    ) * 7;
+            }
+
+            card.style.opacity =
+                opacity.toFixed(4);
+
+            card.style.transform = `
+                translate3d(
+                    calc(-50% + ${x}px),
+                    calc(-50% + ${y}px),
+                    ${z}px
+                )
+                rotateZ(
+                    ${
+                        xDirection *
+                        spread *
+                        4
+                    }deg
+                )
+            `;
+
+            card.style.filter =
+                `blur(${blur.toFixed(2)}px)`;
+
+            card.style.zIndex = String(
+                Math.round(eased * 100)
+            );
+        });
+    }
+
+    function renderDepthInterface(progress) {
+        if (depthScenes.length === 0) {
+            return;
+        }
+
+        const index = Math.min(
+            depthScenes.length - 1,
+            Math.floor(
+                progress * depthScenes.length
+            )
+        );
+
+        setDepthScene(index);
+
+        if (depthProgressFill) {
+            depthProgressFill.style.transform =
+                `scaleX(${progress})`;
+        }
+
+        if (depthLight) {
+            const pulse =
+                1 +
+                Math.sin(
+                    progress *
+                    Math.PI *
+                    depthScenes.length
+                ) * 0.12;
+
+            depthLight.style.transform = `
+                translate(-50%, -50%)
+                scale(${pulse})
+            `;
+        }
+
+        if (depthStage) {
+            const cameraX =
+                Math.sin(
+                    progress * Math.PI * 2
+                ) * 5;
+
+            const cameraY =
+                Math.cos(
+                    progress * Math.PI * 1.4
+                ) * 4;
+
+            depthStage.style.setProperty(
+                "--camera-x",
+                `${cameraX}px`
+            );
+
+            depthStage.style.setProperty(
+                "--camera-y",
+                `${cameraY}px`
+            );
+        }
+    }
+
+    function animateDepthExperience() {
+        if (
+            !depthScroll ||
+            depthCards.length === 0
+        ) {
+            return;
+        }
+
+        depthCurrentProgress = lerp(
+            depthCurrentProgress,
+            depthTargetProgress,
+            0.065
+        );
+
+        if (
+            Math.abs(
+                depthTargetProgress -
+                depthCurrentProgress
+            ) < 0.00005
+        ) {
+            depthCurrentProgress =
+                depthTargetProgress;
+        }
+
+        renderDepthCards(
+            depthCurrentProgress
+        );
+
+        renderDepthInterface(
+            depthCurrentProgress
+        );
+
+        window.requestAnimationFrame(
+            animateDepthExperience
+        );
+    }
+
+   if (
+  depthScroll &&
+  depthCards.length > 0
+) {
+  calculateDepthProgress();
+
+  depthCurrentProgress =
+    depthTargetProgress;
+
+  setDepthScene(0);
+  renderDepthCards(depthCurrentProgress);
+  renderDepthInterface(depthCurrentProgress);
+
+  window.addEventListener(
+    "scroll",
+    calculateDepthProgress,
+    { passive: true }
+  );
+
+  window.addEventListener(
+    "resize",
+    calculateDepthProgress
+  );
+
+  window.requestAnimationFrame(
+    animateDepthExperience
+  );
+}
+
+    
 })();

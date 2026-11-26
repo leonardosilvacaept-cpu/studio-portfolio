@@ -1027,3 +1027,21 @@ img {
         font-size: 0.66rem;
     }
 }
+.admin-preview-link {
+    padding: 10px 0;
+    border: 0;
+    color: var(--admin-text);
+    background: transparent;
+}
+
+.admin-preview-link:hover {
+    color: var(--admin-gold-light);
+}
+
+.admin-preview-link span {
+    transition: transform 180ms ease;
+}
+
+.admin-preview-link:hover span {
+    transform: translate(3px, -3px);
+}
